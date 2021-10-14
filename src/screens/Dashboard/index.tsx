@@ -12,6 +12,7 @@ import {
     User,
     UserGreeting,
     UserName,
+    LogoutButton,
     Icon,
     HighLightCards,
     Transactions,
@@ -70,7 +71,11 @@ export function Dashboard(){
                         </User>
                     </UserInfo>
 
-                    <Icon name="power"/>
+                    <LogoutButton
+                        onPress={() => {console.log('Logout ativo')}}
+                    >
+                        <Icon name="power"/>
+                    </LogoutButton>
                 </UserWrapper>
             </Header>
 
