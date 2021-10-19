@@ -65,8 +65,6 @@ export function Register() {
         resolver: yupResolver(schema)
     });
 
-    const dataKey = '@gofinances:transactions';
-
     function handleTransactionsTypeSelect(type: 'up' | 'down'){
         setTransactionType(type);
     }
@@ -96,6 +94,8 @@ export function Register() {
         }
 
         try {
+            const dataKey = '@gofinances:transactions';
+
             const data = await AsyncStorage.getItem(dataKey);
             const currentData = data ? JSON.parse(data) : [];
 
