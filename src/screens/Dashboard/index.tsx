@@ -136,7 +136,6 @@ export function Dashboard(){
             }
         })
         setIsLoading(false);
-        console.log(transactionsFormatted);
     }
 
     useEffect(()=> {
