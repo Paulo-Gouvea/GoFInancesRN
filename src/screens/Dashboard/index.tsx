@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { ActivityIndicator } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useFocusEffect } from "@react-navigation/native";
+import { useTheme } from "styled-components";
 
 import { HighLightCard } from "../../components/HighLightCard";
 import { TransactionCard, TransactionCardProps } from "../../components/TransactionCard";
@@ -21,6 +23,7 @@ import {
     Transactions,
     Title,
     TransactionList,
+    LoadContainer
 } from "./styles";
 
 export interface DataListProps extends TransactionCardProps {
@@ -38,8 +41,11 @@ interface HighlightData {
 }
 
 export function Dashboard(){
+    const [isLoading, setIsLoading] = useState(true);
     const [transactions, setTransactions] = useState<DataListProps[]>([]);
     const [highlightData, setHighlightData] = useState<HighlightData>({} as HighlightData);
+
+    const theme = useTheme();
 
     async function loadTransactions(){
         const dataKey = '@gofinances:transactions';
@@ -79,7 +85,7 @@ export function Dashboard(){
                 date, 
             }
         });
-
+ 
         setTransactions(transactionsFormatted);
 
         const total = entriesTotal - expensesTotal;
@@ -107,6 +113,7 @@ export function Dashboard(){
                 })
             }
         })
+        setIsLoading(false);
         console.log(transactionsFormatted);
     }
 
@@ -120,58 +127,67 @@ export function Dashboard(){
 
     return (
         <Container>
-            <Header>
-                <UserWrapper>
-                    <UserInfo>
-                        <Photo source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzj26A_IAGzabuI08ddCRTqnMiEvfYaOcyZQ&usqp=CAU' }}/>
-                        <User>
-                            <UserGreeting>Olá, </UserGreeting>
-                            <UserName>Silvio</UserName>
-                        </User>
-                    </UserInfo>
+            {
+                isLoading ? 
+                    <LoadContainer>
+                        <ActivityIndicator color={theme.colors.primary} size="large"/> 
+                    </LoadContainer>
+                :
+                <>
+                    <Header>
+                        <UserWrapper>
+                            <UserInfo>
+                                <Photo source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzj26A_IAGzabuI08ddCRTqnMiEvfYaOcyZQ&usqp=CAU' }}/>
+                                <User>
+                                    <UserGreeting>Olá, </UserGreeting>
+                                    <UserName>Silvio</UserName>
+                                </User>
+                            </UserInfo>
 
-                    <LogoutButton
-                        onPress={() => {console.log('Logout ativo')}}
-                    >
-                        <Icon name="power"/>
-                    </LogoutButton>
-                </UserWrapper>
-            </Header>
+                            <LogoutButton
+                                onPress={() => {console.log('Logout ativo')}}
+                            >
+                                <Icon name="power"/>
+                            </LogoutButton>
+                        </UserWrapper>
+                    </Header>
 
-            <HighLightCards>
-                <HighLightCard
-                    type= "up"
-                    title="Entradas"
-                    amount={highlightData.entries.amount}
-                    lastTransaction="Última entrada dia 13 de abril"
-                />
-                <HighLightCard
-                    type= "down"
-                    title="Saídas"
-                    amount={highlightData.expenses.amount}
-                    lastTransaction="Última saída dia 03 de abril"
-                />
-                <HighLightCard
-                    type = "total"
-                    title="Total"
-                    amount={highlightData.total.amount}
-                    lastTransaction="01 à 16 de abril"
-                />
-            </HighLightCards>
-
-            <Transactions>
-                <Title>Listagem</Title>
-
-                <TransactionList
-                    data={transactions}
-                    keyExtractor={item => item.id}
-                    renderItem={({ item }) => 
-                        <TransactionCard 
-                            data= { item }
+                    <HighLightCards>
+                        <HighLightCard
+                            type= "up"
+                            title="Entradas"
+                            amount={highlightData.entries.amount}
+                            lastTransaction="Última entrada dia 13 de abril"
                         />
-                }
-                />
-            </Transactions>
+                        <HighLightCard
+                            type= "down"
+                            title="Saídas"
+                            amount={highlightData.expenses.amount}
+                            lastTransaction="Última saída dia 03 de abril"
+                        />
+                        <HighLightCard
+                            type = "total"
+                            title="Total"
+                            amount={highlightData.total.amount}
+                            lastTransaction="01 à 16 de abril"
+                        />
+                    </HighLightCards>
+
+                    <Transactions>
+                        <Title>Listagem</Title>
+
+                        <TransactionList
+                            data={transactions}
+                            keyExtractor={item => item.id}
+                            renderItem={({ item }) => 
+                                <TransactionCard 
+                                    data= { item }
+                                />
+                        }
+                        />
+                    </Transactions>
+                </>
+            }
         </Container>
     )
 }
