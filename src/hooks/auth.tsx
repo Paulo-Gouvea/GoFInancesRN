@@ -2,7 +2,8 @@ import React, {
     createContext, 
     ReactNode,
     useContext, 
-    useState
+    useState,
+    useEffect,
 } from 'react';
 
 import * as AuthSession from 'expo-auth-session';
@@ -44,6 +45,9 @@ const AuthContext = createContext({} as AuthContextData);
 // O provider
 function AuthProvider({ children }: AuthProviderProps){
     const [user, setUser] = useState<User>({} as User);
+    const [userStorageLoading, setUserStorageLoading] = useState(true); 
+
+    const userStorageKey = '@gofinances:user';
 
     async function signInWithGoogle(){
         try {
@@ -60,12 +64,15 @@ function AuthProvider({ children }: AuthProviderProps){
                
                 console.log(userInfo);
 
-                setUser({
+                const userLogged = {
                     id: userInfo.id,
                     email: userInfo.email,
                     name: userInfo.given_name,
                     photo: userInfo.picture
-                });
+                };
+
+                setUser(userLogged);
+                await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged));
             }
             
         } catch (error: any | unknown) {
@@ -91,12 +98,27 @@ function AuthProvider({ children }: AuthProviderProps){
                 }
 
                 setUser(userLogged);
-                await AsyncStorage.setItem('@gofinances:user', JSON.stringify(userLogged));
+                await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged));
             }
         } catch (error: any | unknown) {
             throw new Error(error);
         }
     }
+
+    useEffect(()=> {
+        async function loadUserStorageData() {
+            const userStoraged = await AsyncStorage.getItem(userStorageKey);
+
+            if(userStoraged){
+                const userLogged = JSON.parse(userStoraged) as User;
+                setUser(userLogged);    
+            }
+
+            setUserStorageLoading(false);
+        }
+
+        loadUserStorageData();
+    }, []);
 
     return (
         <AuthContext.Provider 
