@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "styled-components";
+import { useAuth } from "../../hooks/auth";
 
 import { HighLightCard } from "../../components/HighLightCard";
 import { TransactionCard, TransactionCardProps } from "../../components/TransactionCard";
@@ -47,6 +48,7 @@ export function Dashboard(){
     const [highlightData, setHighlightData] = useState<HighlightData>({} as HighlightData);
 
     const theme = useTheme();
+    const {signOut, user} = useAuth();
 
     function getLastTransactionDate(
         collection: DataListProps[],
@@ -158,15 +160,15 @@ export function Dashboard(){
                     <Header>
                         <UserWrapper>
                             <UserInfo>
-                                <Photo source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzj26A_IAGzabuI08ddCRTqnMiEvfYaOcyZQ&usqp=CAU' }}/>
+                                <Photo source={{ uri: user.photo }}/>
                                 <User>
                                     <UserGreeting>Olá, </UserGreeting>
-                                    <UserName>Silvio</UserName>
+                                    <UserName>{user.name}</UserName>
                                 </User>
                             </UserInfo>
 
                             <LogoutButton
-                                onPress={() => {console.log('Logout ativo')}}
+                                onPress={signOut}
                             >
                                 <Icon name="power"/>
                             </LogoutButton>
