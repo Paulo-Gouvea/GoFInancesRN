@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
     Modal, 
     TouchableWithoutFeedback, 
@@ -12,6 +12,7 @@ import uuid from 'react-native-uuid';
 
 import { useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../../hooks/auth';
 
 import { InputForm } from '../../components/Forms/InputForm';
@@ -35,6 +36,10 @@ interface FormData {
     amount: string;
 }
 
+interface Props {
+    navigation: BottomTabNavigationProp<any, any>;
+}
+
 const schema = Yup.object().shape({
     name: Yup
     .string()
@@ -46,7 +51,7 @@ const schema = Yup.object().shape({
     .required('O Valor é obrigatorio')
 })
 
-export function Register() {
+export function Register({ navigation }: Props) {
     const [transactionType, setTransactionType] = useState('');
     const [categoryModalOpen, setCategoryModalOpen] = useState(false);
 
@@ -57,7 +62,7 @@ export function Register() {
         name: 'Categoria',
     })
 
-    const navigation = useNavigation();
+    navigation = useNavigation();
 
     const { 
         control,
